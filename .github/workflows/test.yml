@@ -1,0 +1,31 @@
+name: Check bootboot
+
+on: push
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PAT_APPODEAL_RUNNER }}
+
+jobs:
+  test:
+    name: Run rubocop
+    strategy:
+      matrix:
+        target: [ current, next ]
+    runs-on: ubuntu-latest
+    env:
+      DEPENDENCIES_NEXT: ${{ matrix.target }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 1
+      - run: bundle exec ruby app.rb
